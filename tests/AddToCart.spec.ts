@@ -13,7 +13,7 @@ test('Add to cart flow using saved login', async function({page}){
     await loginInventery.GotoApplication();
     const addcart= new AddCart(page);
     await addcart.ClickAddToCart();
-    await expect(addcart.badgeicon).toHaveText('1');
+    await expect(addcart.cartbadgeiconcount).toHaveText('1');
     await expect(addcart.removeitemBtn).toBeVisible();
     await addcart.ClickOnBadgeIcon();
     await expect(page).toHaveURL(/cart\.html/);

@@ -13,10 +13,10 @@ export class CartPage{
     constructor(page:Page){
 
         this.page=page;
-        this.prizelevel=page.locator('.inventory_item_price');
+        this.prizelevel=page.locator('.cart_item .inventory_item_price');
         this.removebtn=page.locator('#remove-sauce-labs-backpack')
-        this.productname=page.locator('#item_4_title_link');
-        this.cartQuantity=page.locator('.cart_quantity');
+        this.productname=page.locator('.cart_item .inventory_item_name');
+        this.cartQuantity=page.locator('.cart_item .cart_quantity');
         this.checkoutBtn=page.locator('#checkout');
     }
 
