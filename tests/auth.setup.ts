@@ -4,7 +4,7 @@ import { LoginPage } from '../Pages/LoginPage';
 setup('Authenticate',async function({page}) {
 
    const loginPage= new LoginPage(page);
-   await page.goto('https://www.saucedemo.com/');
+   await loginPage.GotoApplication();
     await expect(loginPage.loginbtn).toBeVisible();
     await loginPage.doLogin();
     await expect(page).toHaveURL(/inventory\.html/);
