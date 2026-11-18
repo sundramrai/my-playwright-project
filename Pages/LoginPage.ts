@@ -1,5 +1,6 @@
 import {Locator, Page} from '@playwright/test'
 
+
 export class LoginPage{
 
 page:Page;
@@ -28,17 +29,10 @@ async GotoApplication(){
 }
 
 
-async doLogin(){
-    await this.username.fill('standard_user');
-    await this.password.fill('secret_sauce');
+async doLogin(username: string , password: string){
+    await this.username.fill(username);
+    await this.password.fill(password);
     await this.loginbtn.click();
 }
-
-async doInvalidLogin(){
-    await this.username.fill('standard_');
-    await this.password.fill('secret_sauc');
-    await this.loginbtn.click();
-}
-
 
 }
