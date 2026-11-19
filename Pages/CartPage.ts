@@ -1,18 +1,20 @@
 import { Page, Locator } from '@playwright/test';
+import { BasePage } from './Basepage'; 
 
 
-export class CartPage{
+export class CartPage extends BasePage{
 
-    page:Page;
+
     prizelevel:Locator;
     removebtn:Locator;
     productname:Locator;
     cartQuantity:Locator;
     checkoutBtn:Locator;
+   
 
     constructor(page:Page){
 
-        this.page=page;
+        super(page);
         this.prizelevel=page.locator('.cart_item .inventory_item_price');
         this.removebtn=page.locator('#remove-sauce-labs-backpack')
         this.productname=page.locator('.cart_item .inventory_item_name');

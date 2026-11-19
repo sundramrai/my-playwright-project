@@ -20,12 +20,12 @@ constructor(page:Page){
 
 }
 
-async GotoInventory(){
-    await this.page.goto('https://www.saucedemo.com/inventory.html');
+async GotoInventory(url : string){
+    await this.page.goto(url);
 }
 
 async GotoApplication(){
-    await this.page.goto('https://www.saucedemo.com');
+    await this.page.goto('/');
 }
 
 

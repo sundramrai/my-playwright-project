@@ -1,18 +1,20 @@
 import {Locator, Page} from '@playwright/test'
+import { BasePage } from './Basepage';
 
-export class AddCart{
+export class AddCart extends BasePage{
 
-    page:Page;
+    
     addToCartbtn:Locator;
     badgeicon:Locator;
     removeitemBtn:Locator;
     cartbadgeiconcount:Locator;
+    
 
 
 
     constructor(page:Page){
 
-        this.page=page;
+        super(page);
         this.addToCartbtn=page.locator('#add-to-cart-sauce-labs-backpack');
         this.badgeicon=page.locator('.shopping_cart_link');
         this.removeitemBtn=page.locator('#remove-sauce-labs-backpack');

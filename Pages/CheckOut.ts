@@ -1,16 +1,18 @@
 import { Page, Locator } from "@playwright/test";
+import { BasePage } from './Basepage'
 
-export class CheckOut{
+export class CheckOut extends BasePage{
 
-    page:Page;
+    
     firstname:Locator;
     secondname:Locator;
     zipcode:Locator;
     continue:Locator;
+   
 
 
     constructor(page:Page){
-        this.page=page;
+        super(page);
         this.firstname=page.locator('#first-name');
         this.secondname=page.locator('#last-name');
         this.zipcode=page.locator('#postal-code');
