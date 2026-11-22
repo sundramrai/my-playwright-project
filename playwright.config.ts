@@ -1,14 +1,17 @@
 import { defineConfig, devices } from '@playwright/test';
+import { ConfigReader } from './Utils/ConfigReader';
+
+
 
 /**
  * Read environment variables from file.
  * https://github.com/motdotla/dotenv
  */
-import dotenv from 'dotenv';
-import path from 'path';
+// import dotenv from 'dotenv';
+// import path from 'path';
 
-const ENV = process.env.ENV || 'dev';   // kuch na diya to dev
-dotenv.config({ path: path.resolve(__dirname, `Env/.env.${ENV}`) });
+// const ENV = process.env.ENV || 'dev';   // kuch na diya to dev
+// dotenv.config({ path: path.resolve(__dirname, `Env/.env.${ENV}`) });
 
 
 /**
@@ -30,7 +33,7 @@ export default defineConfig({
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
      //baseURL: 'http://localhost:3000',
-     baseURL: process.env.BASE_URL,
+     baseURL: ConfigReader.url,
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
