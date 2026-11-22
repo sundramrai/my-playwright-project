@@ -1,5 +1,4 @@
 import { test, expect } from '../Fixture/PageFixture'
-import { LoginPage } from '../Pages/LoginPage';
 import UserData from '../TestData/UserData.json'
 import { TEST_DATA } from '../TestData/testData';
 
@@ -9,7 +8,7 @@ import { TEST_DATA } from '../TestData/testData';
 test.describe('Login', () => {
     test.use({ storageState: { cookies: [], origins: [] } });   // sirf is group par lagega
 
-    test('Invalid Login Flow', async function ({ page ,loginpage}) {
+    test('@smoke Invalid Login Flow', async function ({ page ,loginpage}) {
        
         await loginpage.GotoApplication();
         await loginpage.doLogin(UserData.invalidUser.username,UserData.invalidUser.password);
@@ -18,7 +17,7 @@ test.describe('Login', () => {
         await expect(loginpage.errormsg).toContainText('Username and password do not match');
     });
 
-    test('Locked user Login Flow', async function ({ page,loginpage}) {
+    test('@regression Locked user Login Flow', async function ({ page,loginpage}) {
        
         await loginpage.GotoApplication();
         await loginpage.doLogin(UserData.lockedUser.username,UserData.lockedUser.password);
@@ -33,7 +32,7 @@ test.describe('Login', () => {
 
 test.describe('Cart', () => {
 
-    test('Add to cart flow using saved login', async function ({ page,loginpage,cartpage ,addcart , checkout }) {
+    test('@Sanity Add to cart flow using saved login', async function ({ page,loginpage,cartpage ,addcart , checkout }) {
 
         
         await loginpage.GotoInventory(TEST_DATA.urls.inventory);
