@@ -22,4 +22,9 @@ export class Header{
      async clickOnCloseBurger(){
         await this.burgermenuCloseIcon.click();
     }
+
+    async clickonLogout(){
+         await this.burgerMenu.click();
+         await this.logoutLink.click();
+    }
 }

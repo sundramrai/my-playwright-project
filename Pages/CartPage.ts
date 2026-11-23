@@ -1,28 +1,35 @@
 import { Page, Locator } from '@playwright/test';
-import { BasePage } from './Basepage'; 
+import { BasePage } from './Basepage';
 
 
-export class CartPage extends BasePage{
+export class CartPage extends BasePage {
+
+    checkoutBtn: Locator;
 
 
-    prizelevel:Locator;
-    removebtn:Locator;
-    productname:Locator;
-    cartQuantity:Locator;
-    checkoutBtn:Locator;
-   
-
-    constructor(page:Page){
+    constructor(page: Page) {
 
         super(page);
-        this.prizelevel=page.locator('.cart_item .inventory_item_price');
-        this.removebtn=page.locator('#remove-sauce-labs-backpack')
-        this.productname=page.locator('.cart_item .inventory_item_name');
-        this.cartQuantity=page.locator('.cart_item .cart_quantity');
-        this.checkoutBtn=page.locator('#checkout');
+        this.checkoutBtn = page.locator('#checkout');
     }
 
-    async clickOnCheckOut(){
+
+    // One cart item (row), found by its product name
+    cartItem(name: string) {
+        return this.page.locator('.cart_item').filter({ hasText: name });
+    }
+
+    itemPrice(name: string) { return this.cartItem(name).locator('.inventory_item_price'); }
+    itemQuantity(name: string) { return this.cartItem(name).locator('.cart_quantity'); }
+    itemRemoveBtn(name: string) { return this.cartItem(name).getByRole('button', { name: 'Remove' }); }
+
+
+    async clickOnCheckOut() {
         await this.checkoutBtn.click();
+    }
+
+
+    async RemoveitemfromCart(productName: string) {
+        await this.itemRemoveBtn(productName).click();
     }
 }

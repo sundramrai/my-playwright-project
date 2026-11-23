@@ -17,7 +17,11 @@ Tests run in GitHub Actions on every push and pull request to `main`, in Chromiu
 |------|-----|----------------|
 | Invalid login | `@smoke` | Wrong username and password show the "do not match" error and stay on the login page |
 | Locked user login | `@regression` | A locked-out user sees the "locked out" error |
-| Add to cart flow | `@Sanity` | End to end purchase: add a product, check the cart badge, product name, price and quantity, open and close the menu on each page, fill the checkout form, check item price, tax and total on the overview page, finish the order and check the "Thank you for your order!" page |
+| Add to cart flow | `@Sanity` | End to end purchase: add two products, check the cart badge, each item's name, price and quantity, remove one item and check it is gone, open and close the menu on each page, fill the checkout form, check item price, tax and total on the overview page, finish the order, check the "Thank you for your order!" page, then log out |
+| Sort by price | | Low to high and high to low: the prices on the page match the same prices sorted in code |
+| Sort by name | | A to Z and Z to A: the names on the page match the same names sorted in code |
+
+Cart items are found by product name (`cartpage.itemPrice('Sauce Labs Backpack')`), so the same methods work for any number of products.
 
 ## Framework design
 
