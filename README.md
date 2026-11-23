@@ -17,7 +17,7 @@ Tests run in GitHub Actions on every push and pull request to `main`, in Chromiu
 |------|-----|----------------|
 | Invalid login | `@smoke` | Wrong username and password show the "do not match" error and stay on the login page |
 | Locked user login | `@regression` | A locked-out user sees the "locked out" error |
-| Add to cart flow | `@Sanity` | Add a product, check the cart badge, product name, price and quantity, open and close the menu on each page, fill the checkout form and reach the overview page |
+| Add to cart flow | `@Sanity` | End to end purchase: add a product, check the cart badge, product name, price and quantity, open and close the menu on each page, fill the checkout form, check item price, tax and total on the overview page, finish the order and check the "Thank you for your order!" page |
 
 ## Framework design
 

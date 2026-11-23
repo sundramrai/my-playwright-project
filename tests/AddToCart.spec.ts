@@ -8,19 +8,19 @@ import { TEST_DATA } from '../TestData/testData';
 test.describe('Login', () => {
     test.use({ storageState: { cookies: [], origins: [] } });   // sirf is group par lagega
 
-    test('@smoke Invalid Login Flow', async function ({ page ,loginpage}) {
-       
+    test('@smoke Invalid Login Flow', async function ({ page, loginpage }) {
+
         await loginpage.GotoApplication();
-        await loginpage.doLogin(UserData.invalidUser.username,UserData.invalidUser.password);
+        await loginpage.doLogin(UserData.invalidUser.username, UserData.invalidUser.password);
         await expect(page).not.toHaveURL(TEST_DATA.urls.inventory);
         await expect(loginpage.errormsg).toBeVisible();
         await expect(loginpage.errormsg).toContainText('Username and password do not match');
     });
 
-    test('@regression Locked user Login Flow', async function ({ page,loginpage}) {
-       
+    test('@regression Locked user Login Flow', async function ({ page, loginpage }) {
+
         await loginpage.GotoApplication();
-        await loginpage.doLogin(UserData.lockedUser.username,UserData.lockedUser.password);
+        await loginpage.doLogin(UserData.lockedUser.username, UserData.lockedUser.password);
         await expect(page).not.toHaveURL(TEST_DATA.urls.inventory);
         await expect(loginpage.errormsg).toBeVisible();
         await expect(loginpage.errormsg).toContainText('Sorry, this user has been locked out.');
@@ -32,11 +32,11 @@ test.describe('Login', () => {
 
 test.describe('Cart', () => {
 
-    test('@Sanity Add to cart flow using saved login', async function ({ page,loginpage,cartpage ,addcart , checkout }) {
+    test('@Sanity Add to cart flow using saved login', async function ({ page, loginpage, cartpage, addcart, checkout, checkoutfinal, checkoutComplete }) {
 
-        
+
         await loginpage.GotoInventory(TEST_DATA.urls.inventory);
-       
+
         await addcart.ClickAddToCart();
         await addcart.header.clickOnopenBurger();
         await expect(addcart.header.logoutLink).toBeVisible();
@@ -46,26 +46,43 @@ test.describe('Cart', () => {
         await expect(addcart.removeitemBtn).toBeVisible();
         await addcart.ClickOnBadgeIcon();
         await expect(page).toHaveURL(TEST_DATA.urls.cart);
-       
+
         await expect(cartpage.productname).toHaveText('Sauce Labs Backpack');
         await expect(cartpage.prizelevel).toHaveText('$29.99');
         await expect(cartpage.cartQuantity).toHaveText('1');
         await expect(cartpage.removebtn).toBeVisible();
         await expect(cartpage.checkoutBtn).toBeVisible();
-         await cartpage.header.clickOnopenBurger();
+        await cartpage.header.clickOnopenBurger();
         await expect(cartpage.header.logoutLink).toBeVisible();
         await cartpage.header.clickOnCloseBurger();
         await expect(cartpage.header.logoutLink).toBeHidden();
         await cartpage.clickOnCheckOut();
         await expect(page).toHaveURL(TEST_DATA.urls.checkout);
-    
+
+
+
         await checkout.fillFrom();
-         await checkout.header.clickOnopenBurger();
+        await checkout.header.clickOnopenBurger();
         await expect(checkout.header.logoutLink).toBeVisible();
         await checkout.header.clickOnCloseBurger();
         await expect(checkout.header.logoutLink).toBeHidden();
         await checkout.clickOnContinue();
         await expect(page).toHaveURL(TEST_DATA.urls.checkout2);
+
+        await expect(checkoutfinal.productAmount).toHaveText('$29.99');
+        await expect(checkoutfinal.tax).toHaveText('Tax: $2.40');
+        await expect(checkoutfinal.finalamount).toHaveText('Total: $32.39');
+        await checkout.header.clickOnopenBurger();
+        await expect(checkout.header.logoutLink).toBeVisible();
+        await checkout.header.clickOnCloseBurger();
+        await expect(checkout.header.logoutLink).toBeHidden();
+        await checkoutfinal.clickOnFinished();
+        await expect(page).toHaveURL(TEST_DATA.urls.checkoutComplete);
+
+        await expect(checkoutComplete.orderCompleteHeader).toHaveText('Checkout: Complete!');
+        await expect(checkoutComplete.orderCompleteText).toHaveText('Thank you for your order!');
+        await expect(checkoutComplete.backhomeBtn).toBeVisible();
+        await expect(checkoutComplete.GeneratePdfBtn).toBeVisible();
 
 
 

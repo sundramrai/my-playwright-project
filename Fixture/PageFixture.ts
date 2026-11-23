@@ -4,6 +4,8 @@ import { LoginPage } from '../Pages/LoginPage';
 import { AddCart } from '../Pages/AddCart';
 import { CartPage } from '../Pages/CartPage';
 import { CheckOut } from '../Pages/CheckOut';
+import { CheckOutFinal } from '../Pages/CheckoutFinal';
+import { CheckOutComplete } from '../Pages/CheckOutComplete';
 
 type MyFixture={
 
@@ -11,6 +13,8 @@ type MyFixture={
     addcart:AddCart;
     cartpage:CartPage;
     checkout:CheckOut;
+    checkoutfinal:CheckOutFinal;
+    checkoutComplete:CheckOutComplete;
 
 }
 
@@ -31,6 +35,18 @@ export const test= base.extend<MyFixture>({
 
      checkout: async function ({page},use) {
         await use(new CheckOut(page))
+        
+    },
+
+
+     checkoutfinal: async function ({page},use) {
+        await use(new CheckOutFinal(page))
+        
+    },
+
+
+    checkoutComplete: async function ({page},use) {
+        await use(new CheckOutComplete(page))
         
     }
 
