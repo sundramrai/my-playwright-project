@@ -34,81 +34,81 @@ test.describe('Cart', () => {
 
     test('@Sanity Add to cart flow using saved login', async function ({ page, loginpage, cartpage, addcart, checkout, checkoutfinal, checkoutComplete }) {
 
+        await test.step('Add two items from the inventory page', async () => {
+            await loginpage.GotoInventory(TEST_DATA.urls.inventory);
+            await addcart.ClickAddToCart();
+            await addcart.header.verifyBurgerMenuOpensAndCloses();
+            await expect(addcart.cartbadgeiconcount).toHaveText('2');
+            await expect(addcart.removeitemBtn).toBeVisible();
+            await expect(addcart.removeitemBtn2).toBeVisible();
+            await addcart.ClickOnBadgeIcon();
+            await expect(page).toHaveURL(TEST_DATA.urls.cart);
+        });
 
-        await loginpage.GotoInventory(TEST_DATA.urls.inventory);
+        await test.step('Check both items in the cart', async () => {
+            await expect(cartpage.cartItem('Sauce Labs Backpack')).toBeVisible();
+            await expect(cartpage.itemPrice('Sauce Labs Backpack')).toHaveText('$29.99');
+            await expect(cartpage.itemQuantity('Sauce Labs Backpack')).toHaveText('1');
 
-        await addcart.ClickAddToCart();
-        await addcart.header.clickOnopenBurger();
-        await expect(addcart.header.logoutLink).toBeVisible();
-        await addcart.header.clickOnCloseBurger();
-        await expect(addcart.header.logoutLink).toBeHidden();
-        await expect(addcart.cartbadgeiconcount).toHaveText('2');
-        await expect(addcart.removeitemBtn).toBeVisible();
-        await expect(addcart.removeitemBtn2).toBeVisible();
-        await addcart.ClickOnBadgeIcon();
-        await expect(page).toHaveURL(TEST_DATA.urls.cart);
+            await expect(cartpage.cartItem('Sauce Labs Bike Light')).toBeVisible();
+            await expect(cartpage.itemPrice('Sauce Labs Bike Light')).toHaveText('$9.99');
+            await expect(cartpage.itemQuantity('Sauce Labs Bike Light')).toHaveText('1');
+        });
 
+        await test.step('Remove one item from the cart', async () => {
+            await cartpage.RemoveitemfromCart('Sauce Labs Bike Light');
+            await expect(cartpage.cartItem('Sauce Labs Bike Light')).toHaveCount(0);
+            await expect(addcart.cartbadgeiconcount).toHaveText('1');
+        });
 
+        await test.step('Go to checkout', async () => {
+            await expect(cartpage.checkoutBtn).toBeVisible();
+            await cartpage.header.verifyBurgerMenuOpensAndCloses();
+            await cartpage.clickOnCheckOut();
+            await expect(page).toHaveURL(TEST_DATA.urls.checkout);
+        });
 
-        await expect(cartpage.cartItem('Sauce Labs Backpack')).toBeVisible();
-        await expect(cartpage.itemPrice('Sauce Labs Backpack')).toHaveText('$29.99');
-        await expect(cartpage.itemQuantity('Sauce Labs Backpack')).toHaveText('1');
+        await test.step('Fill the checkout form', async () => {
+            await checkout.fillFrom();
+            await checkout.header.verifyBurgerMenuOpensAndCloses();
+            await checkout.clickOnContinue();
+            await expect(page).toHaveURL(TEST_DATA.urls.checkout2);
+        });
 
-        await expect(cartpage.cartItem('Sauce Labs Bike Light')).toBeVisible();
-        await expect(cartpage.itemPrice('Sauce Labs Bike Light')).toHaveText('$9.99');
-        await expect(cartpage.itemQuantity('Sauce Labs Bike Light')).toHaveText('1');
-    
+        await test.step('Check the order total and finish', async () => {
+            await expect(checkoutfinal.productAmount).toHaveText('$29.99');
+            await expect(checkoutfinal.tax).toHaveText('Tax: $2.40');
+            await expect(checkoutfinal.finalamount).toHaveText('Total: $32.39');
+            await checkoutfinal.header.verifyBurgerMenuOpensAndCloses();
+            await checkoutfinal.clickOnFinished();
+            await expect(page).toHaveURL(TEST_DATA.urls.checkoutComplete);
+        });
 
-        await cartpage.RemoveitemfromCart('Sauce Labs Bike Light');
-        await expect(cartpage.cartItem('Sauce Labs Bike Light')).toHaveCount(0);  
-        await expect(addcart.cartbadgeiconcount).toHaveText('1');  
+        await test.step('Check the order complete page', async () => {
+            await checkoutComplete.header.verifyBurgerMenuOpensAndCloses();
+            await expect(checkoutComplete.orderCompleteHeader).toHaveText('Checkout: Complete!');
+            await expect(checkoutComplete.orderCompleteText).toHaveText('Thank you for your order!');
+            await expect(checkoutComplete.backhomeBtn).toBeVisible();
+            await expect(checkoutComplete.GeneratePdfBtn).toBeVisible();
+        });
 
-
-        await expect(cartpage.checkoutBtn).toBeVisible();
-        await cartpage.header.clickOnopenBurger();
-        await expect(cartpage.header.logoutLink).toBeVisible();
-        await cartpage.header.clickOnCloseBurger();
-        await expect(cartpage.header.logoutLink).toBeHidden();
-        await cartpage.clickOnCheckOut();
-        await expect(page).toHaveURL(TEST_DATA.urls.checkout);
-
-
-
-        await checkout.fillFrom();
-        await checkout.header.clickOnopenBurger();
-        await expect(checkout.header.logoutLink).toBeVisible();
-        await checkout.header.clickOnCloseBurger();
-        await expect(checkout.header.logoutLink).toBeHidden();
-        await checkout.clickOnContinue();
-        await expect(page).toHaveURL(TEST_DATA.urls.checkout2);
-
-        await expect(checkoutfinal.productAmount).toHaveText('$29.99');
-        await expect(checkoutfinal.tax).toHaveText('Tax: $2.40');
-        await expect(checkoutfinal.finalamount).toHaveText('Total: $32.39');
-        await checkout.header.clickOnopenBurger();
-        await expect(checkout.header.logoutLink).toBeVisible();
-        await checkout.header.clickOnCloseBurger();
-        await expect(checkout.header.logoutLink).toBeHidden();
-        await checkoutfinal.clickOnFinished();
-        await expect(page).toHaveURL(TEST_DATA.urls.checkoutComplete);
-
-         await checkout.header.clickOnopenBurger();
-        await expect(checkout.header.logoutLink).toBeVisible();
-        await checkout.header.clickOnCloseBurger();
-        await expect(checkout.header.logoutLink).toBeHidden();
-        await expect(checkoutComplete.orderCompleteHeader).toHaveText('Checkout: Complete!');
-        await expect(checkoutComplete.orderCompleteText).toHaveText('Thank you for your order!');
-        await expect(checkoutComplete.backhomeBtn).toBeVisible();
-        await expect(checkoutComplete.GeneratePdfBtn).toBeVisible();
-        await checkoutComplete.header.clickonLogout();
-        await expect(checkoutComplete.header.logoutLink).toBeHidden();
-         await expect(page).toHaveURL('/');
-         await expect(loginpage.loginbtn).toBeVisible();
-
-
+        await test.step('Log out', async () => {
+            await checkoutComplete.header.clickonLogout();
+            await expect(checkoutComplete.header.logoutLink).toBeHidden();
+            await expect(page).toHaveURL('/');
+            await expect(loginpage.loginbtn).toBeVisible();
+        });
     });
 });
 
+
+const sortCases = [
+    { title: 'price low to high', option: 'lohi', type: 'price', order: 'asc',  firstItem: '$7.99' },
+    { title: 'price high to low', option: 'hilo', type: 'price', order: 'desc', firstItem: '$49.99' },
+   
+    { title: 'name A to Z', option: 'az',   type: 'name',  order: 'asc',  firstItem: 'Sauce Labs Backpack', sortFirst: 'za' },
+    { title: 'name Z to A', option: 'za',   type: 'name',  order: 'desc', firstItem: 'Test.allTheThings() T-Shirt (Red)' },
+];
 
 test.describe('Sorting', () => {
 
@@ -116,42 +116,26 @@ test.describe('Sorting', () => {
         await loginpage.GotoInventory(TEST_DATA.urls.inventory);
     });
 
-    test('Sort by price low to high', async function ({ addcart }) {
-        await addcart.sortBy('lohi');
-        await expect(addcart.itemPrices.first()).toHaveText('$7.99');      // wait until the page is sorted
+    for (const c of sortCases) {
 
-        const prices = await addcart.getAllPrices();
-        const expected = [...prices].sort((a, b) => a - b);                // copy, smallest first
-        expect(prices).toEqual(expected);
-    });
+        test(`Sort by ${c.title}`, async function ({ addcart }) {
+            if (c.sortFirst) {
+                await addcart.sortBy(c.sortFirst);
+            }
+            await addcart.sortBy(c.option);
 
-    test('Sort by price high to low', async function ({ addcart }) {
-        await addcart.sortBy('hilo');
-        await expect(addcart.itemPrices.first()).toHaveText('$49.99');
-
-        const prices = await addcart.getAllPrices();
-        const expected = [...prices].sort((a, b) => b - a);                // copy, biggest first
-        expect(prices).toEqual(expected);
-    });
-
-    test('Sort by name A to Z', async function ({ addcart }) {
-        // The page is A to Z by default, so sort Z to A first to make sure the A to Z click really works
-        await addcart.sortBy('za');
-        await addcart.sortBy('az');
-        await expect(addcart.itemNames.first()).toHaveText('Sauce Labs Backpack');
-
-        const names = await addcart.getAllNames();
-        const expected = [...names].sort();
-        expect(names).toEqual(expected);
-    });
-
-    test('Sort by name Z to A', async function ({ addcart }) {
-        await addcart.sortBy('za');
-        await expect(addcart.itemNames.first()).toHaveText('Test.allTheThings() T-Shirt (Red)');
-
-        const names = await addcart.getAllNames();
-        const expected = [...names].sort().reverse();
-        expect(names).toEqual(expected);
-    });
-
+            if (c.type === 'price') {
+                await expect(addcart.itemPrices.first()).toHaveText(c.firstItem);   // wait until the page is sorted
+                const prices = await addcart.getAllPrices();
+                const expected = [...prices].sort((a, b) => c.order === 'asc' ? a - b : b - a);
+                expect(prices).toEqual(expected);
+            } else {
+                await expect(addcart.itemNames.first()).toHaveText(c.firstItem);
+                const names = await addcart.getAllNames();
+                const expected = [...names].sort();
+                if (c.order === 'desc') expected.reverse();
+                expect(names).toEqual(expected);
+            }
+        });
+    }
 });
