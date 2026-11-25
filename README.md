@@ -26,11 +26,14 @@ Cart items are found by product name (`cartpage.itemPrice('Sauce Labs Backpack')
 ## Framework design
 
 - **Page Object Model**: each page has its own class in `Pages/` with its locators and actions. Tests only call page methods and assert.
-- **Reusable component**: the header (burger menu) is used on many pages, so it lives once in `Components/headerComponent.ts`.
+- **Reusable component**: the header (burger menu) is used on many pages, so it lives once in `Components/headerComponent.ts`. Its `verifyBurgerMenuOpensAndCloses()` method replaces the same four lines that were repeated on every page.
 - **BasePage**: `Pages/Basepage.ts` holds `page` and `header`. Page classes extend it, so every page gets the header without repeating code.
 - **Custom fixtures**: `Fixture/PageFixture.ts` extends Playwright's `test` and creates the page objects. Tests receive them as parameters (`loginpage`, `cartpage`, ...), with no `new LoginPage(page)` in tests.
 - **Log in once**: a `setup` project (`tests/auth.setup.ts`) logs in and saves the session with `storageState`. The browser projects depend on it and reuse the session, so cart tests start already logged in. Login tests clear the session to test the login page itself.
 - **Environment config**: `Env/.env.dev` and `Env/.env.qa` hold the base URL and credentials. `Utils/ConfigReader.ts` loads the file for the chosen environment and throws a clear error if a value is missing.
+- **Spec files by feature**: login, cart and sorting tests are in separate files. Every test is independent (cart and sort tests start from the saved session), so the files can run in any order or in parallel.
+- **Test steps**: the long purchase test is split into named `test.step` blocks (add items, check cart, checkout, order total, ...), so the HTML report shows which part failed.
+- **Data-driven tests**: the sort tests are one test inside a loop over a `sortCases` table (dropdown value, expected first item, order). Adding a new sort case is one new row.
 - **Test data**: users (valid, invalid, locked) are in `TestData/UserData.json`. Page URLs are in `TestData/testData.ts` and are relative, so they work with `baseURL`.
 
 ## Project structure
@@ -44,7 +47,9 @@ Cart items are found by product name (`cartpage.itemPrice('Sauce Labs Backpack')
 ├── Utils/               ConfigReader (reads env values)
 ├── tests/
 │   ├── auth.setup.ts    Logs in once, saves session
-│   └── AddToCart.spec.ts
+│   ├── Login.spec.ts    Invalid and locked user login
+│   ├── Cart.spec.ts     Add to cart through order complete
+│   └── Sort.spec.ts     Data-driven sorting tests
 ├── playwright.config.ts
 └── .github/workflows/   CI pipeline
 ```
@@ -63,6 +68,7 @@ Run:
 ```bash
 npx playwright test                         # all browsers, dev environment
 npx playwright test --project=chromium      # one browser
+npx playwright test Cart                    # one spec file (Login, Cart or Sort)
 ENV=qa npx playwright test                  # qa environment
 npx playwright test --grep @smoke           # only tests tagged @smoke
 npx playwright test --headed                # watch the browser
