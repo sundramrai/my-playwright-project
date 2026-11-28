@@ -1,0 +1,12 @@
+
+    {
+        "firstname": "Sundram",
+        "lastname": "post test",
+        "totalprice": 5000,
+        "depositpaid": true,
+        "bookingdates": {
+            "checkin": "2026-12-10",
+            "checkout": "2026-12-12"
+        },
+        "additionalneeds": "Breakfast"
+    }

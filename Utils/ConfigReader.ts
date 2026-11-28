@@ -9,6 +9,10 @@ export class ConfigReader{
     static readonly url= ConfigReader.getEnv('BASE_URL');
     static readonly user= ConfigReader.getEnv('USERNAME');
     static readonly password= ConfigReader.getEnv('PASSWORD');
+    static readonly apiUrl= ConfigReader.getEnv('API_URL');
+    static readonly apiUser=ConfigReader.getEnv('API_USERNAME');
+    static readonly apiPassword=ConfigReader.getEnv('API_PASSWORD');
+
 
 
 

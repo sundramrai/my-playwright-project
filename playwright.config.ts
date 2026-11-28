@@ -44,8 +44,17 @@ export default defineConfig({
 
     { name: 'setup', testMatch: /.*\.setup\.ts/ },
 
+    // API tests: no browser, no login session, own base URL
+    {
+      name: 'api',
+      testDir: './tests/api',
+      use: { baseURL: ConfigReader.apiUrl,
+      extraHTTPHeaders: { Accept: 'application/json' } },
+    },
+
     {
       name: 'chromium',
+      testIgnore: /api\//,
       use: { ...devices['Desktop Chrome'] ,
       storageState: 'playwright/.auth/user.json'},
       dependencies: ['setup'],
@@ -53,6 +62,7 @@ export default defineConfig({
 
     {
       name: 'firefox',
+      testIgnore: /api\//,
       use: { ...devices['Desktop Firefox'] ,
       storageState: 'playwright/.auth/user.json'},
       dependencies: ['setup'],
@@ -60,6 +70,7 @@ export default defineConfig({
 
     {
       name: 'webkit',
+      testIgnore: /api\//,
       use: { ...devices['Desktop Safari'] ,
       storageState: 'playwright/.auth/user.json'},
       dependencies: ['setup'],

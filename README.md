@@ -1,8 +1,11 @@
 # Playwright Test Automation Framework
 
-UI test automation for the [Sauce Demo](https://www.saucedemo.com) e-commerce site, built with **Playwright** and **TypeScript** using the Page Object Model.
+UI and API test automation built with **Playwright** and **TypeScript**:
 
-Tests run in GitHub Actions on every push and pull request to `main`, in Chromium, Firefox and WebKit.
+- **UI tests** for the [Sauce Demo](https://www.saucedemo.com) e-commerce site, using the Page Object Model
+- **API tests** for the [Restful Booker](https://restful-booker.herokuapp.com) booking API, using the same object-model idea for API calls
+
+Tests run in GitHub Actions on every push and pull request to `main`: UI tests in Chromium, Firefox and WebKit, and API tests in their own `api` project with no browser.
 
 ## Tech stack
 
@@ -13,6 +16,8 @@ Tests run in GitHub Actions on every push and pull request to `main`, in Chromiu
 
 ## What is covered
 
+### UI tests (Sauce Demo)
+
 | Test | Tag | What it checks |
 |------|-----|----------------|
 | Invalid login | `@smoke` | Wrong username and password show the "do not match" error and stay on the login page |
@@ -22,6 +27,20 @@ Tests run in GitHub Actions on every push and pull request to `main`, in Chromiu
 | Sort by name | | A to Z and Z to A: the names on the page match the same names sorted in code |
 
 Cart items are found by product name (`cartpage.itemPrice('Sauce Labs Backpack')`), so the same methods work for any number of products.
+
+### API tests (Restful Booker)
+
+All API tests are tagged `@api`.
+
+| Test | What it checks |
+|------|----------------|
+| GET all bookings | Status 200, the body is a non-empty list and each item has a `bookingid` |
+| GET one booking | Takes a real id from the list, then checks status 200 and that the booking has name, price and check-in/check-out dates |
+| Create booking | POST a new booking from `TestData/BookingData.json`, then GET the same id and check the saved booking equals the data that was sent |
+| Update and delete with auth token | In `test.step` blocks: get a token from `/auth`, create a booking, update it with the token (200 and the new values come back), update with a wrong token (403), delete it (201), then GET it again (404) |
+| Booking ids are unique | No id appears twice in the booking list |
+
+The demo API is shared by everyone, so tests never depend on a fixed booking id: they create their own booking or take an id from the current list.
 
 ## Framework design
 
@@ -34,22 +53,28 @@ Cart items are found by product name (`cartpage.itemPrice('Sauce Labs Backpack')
 - **Spec files by feature**: login, cart and sorting tests are in separate files. Every test is independent (cart and sort tests start from the saved session), so the files can run in any order or in parallel.
 - **Test steps**: the long purchase test is split into named `test.step` blocks (add items, check cart, checkout, order total, ...), so the HTML report shows which part failed.
 - **Data-driven tests**: the sort tests are one test inside a loop over a `sortCases` table (dropdown value, expected first item, order). Adding a new sort case is one new row.
-- **Test data**: users (valid, invalid, locked) are in `TestData/UserData.json`. Page URLs are in `TestData/testData.ts` and are relative, so they work with `baseURL`.
+- **API object model**: `Api/AuthApi.ts` and `Api/BookingApi.ts` hold the API calls, the same way page classes hold page actions. `AuthApi.getToken()` logs in and returns the token. `BookingApi` methods (get, create, update, delete) only send the request and return the response; the test decides which status is expected. That is how one `updateBookingDetails()` method is used for both the 200 (valid token) and the 403 (wrong token) checks.
+- **API fixtures**: `Fixture/ApiFixture.ts` builds the API classes from Playwright's `request` fixture, so API tests receive them as parameters, like the page fixtures.
+- **Separate API project**: the `api` project in `playwright.config.ts` runs only `tests/api/`, with the API base URL and an `Accept: application/json` header. It has no browser and no login session, and the browser projects ignore `tests/api/`, so API tests run once instead of once per browser.
+- **Test data**: users (valid, invalid, locked) are in `TestData/UserData.json`. Page URLs are in `TestData/testData.ts` and are relative, so they work with `baseURL`. API request bodies are in `TestData/BookingData.json` and `TestData/UpdateBookingData.json`.
 
 ## Project structure
 
 ```
+├── Api/                 API classes: AuthApi (token), BookingApi (CRUD)
 ├── Components/          Reusable UI parts (Header)
 ├── Env/                 .env.dev, .env.qa
-├── Fixture/             Custom fixtures that create page objects
+├── Fixture/             PageFixture (page objects), ApiFixture (API classes)
 ├── Pages/               Page objects + BasePage
-├── TestData/            JSON users, URL paths
+├── TestData/            JSON users, URL paths, booking request bodies
 ├── Utils/               ConfigReader (reads env values)
 ├── tests/
 │   ├── auth.setup.ts    Logs in once, saves session
 │   ├── Login.spec.ts    Invalid and locked user login
 │   ├── Cart.spec.ts     Add to cart through order complete
-│   └── Sort.spec.ts     Data-driven sorting tests
+│   ├── Sort.spec.ts     Data-driven sorting tests
+│   └── api/
+│       └── booking.spec.ts   Restful Booker API tests
 ├── playwright.config.ts
 └── .github/workflows/   CI pipeline
 ```
@@ -66,8 +91,10 @@ npx playwright install
 Run:
 
 ```bash
-npx playwright test                         # all browsers, dev environment
-npx playwright test --project=chromium      # one browser
+npx playwright test                         # everything: all browsers + API, dev environment
+npx playwright test --project=chromium      # UI tests in one browser
+npx playwright test --project=api           # only API tests
+npx playwright test --grep @api             # only tests tagged @api
 npx playwright test Cart                    # one spec file (Login, Cart or Sort)
 ENV=qa npx playwright test                  # qa environment
 npx playwright test --grep @smoke           # only tests tagged @smoke
@@ -79,4 +106,4 @@ npx playwright show-report                  # open the HTML report
 
 ## Note on the .env files
 
-The `.env` files are committed so that CI can run. They only contain the public demo credentials published on the Sauce Demo login page. In a real project these files would be git-ignored and CI would read the values from GitHub Secrets.
+The `.env` files are committed so that CI can run. They only contain the public demo credentials published by Sauce Demo and Restful Booker. In a real project these files would be git-ignored and CI would read the values from GitHub Secrets.
